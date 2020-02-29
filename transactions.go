@@ -1,4 +1,4 @@
-package monzo
+package myzo
 
 func bulkTransactionsRequest(auth *AuthMonzo, daysAgo int, expandBy string) *TransactionsResponse {
 	r, _ := auth.transactionResponseHandler(true, daysAgo, expandBy, "")

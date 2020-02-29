@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-    authMonzo := monzo.AuthMonzo{ClientID: "Your ClientID", 
+    authMonzo := myzo.AuthMonzo{ClientID: "Your ClientID", 
                                 UserID: "Your UserID", 
                                 AccessToken: "YourAccessToken", 
                                 AccountID: "Your AccountID", 
@@ -25,7 +25,7 @@ func main() {
 // Or..
 
 func main() {
-	authMonzo := monzo.AuthMonzo{ClientID: "Your ClientID", 
+	authMonzo := myzo.AuthMonzo{ClientID: "Your ClientID", 
                                 UserID: "Your UserID", 
                                 AccessToken: "YourAccessToken", 
                                 AccountID: "Your AccountID", 

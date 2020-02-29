@@ -1,4 +1,4 @@
-package monzo
+package myzo
 
 import (
 	"testing"

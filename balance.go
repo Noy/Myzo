@@ -1,4 +1,4 @@
-package monzo
+package myzo
 
 func baseBalanceRequest(auth *AuthMonzo) *BalanceResponse {
 	r, _ := auth.balanceResponseHandler()
