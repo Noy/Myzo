@@ -30,11 +30,10 @@ func main() {
                                 AccessToken: "YourAccessToken", 
                                 AccountID: "Your AccountID", 
                                 Debug:true}
-    for _, transaction := range auth.GetAllTransactions(5, "merchant") {
+    for _, transaction := range auth.GetAllTransactions(5, "merchant", "") {
         fmt.Println(transaction.Merchant)
     }
 }
 ``` 
 
-##### More coming soon, but please note it can only be used to make..
-#### applications dedicated to your account.
+##### More coming soon, but please note it can only be used to make applications dedicated to your account.
