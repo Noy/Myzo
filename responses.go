@@ -76,3 +76,13 @@ type Merchant struct {
 	Updated time.Time `json:"updated"`
 	DisableFeedback bool `json:"disable_feedback"`
 }
+
+type AccountResponse struct {
+	Accounts []Account `json:"accounts"`
+}
+
+type Account struct {
+	ID string `json:"id"`
+	Description string `json:"description"`
+	Created time.Time `json:"created"`
+}

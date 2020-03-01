@@ -9,28 +9,28 @@
 package main
 
 import (
-	"github.com/Noy/Monzo"
     "fmt"
+    "github.com/Noy/Myzo"
 )
 
 func main() {
-    authMonzo := myzo.AuthMonzo{ClientID: "Your ClientID", 
+    auth := myzo.Myzo{ClientID: "Your ClientID", 
                                 UserID: "Your UserID", 
                                 AccessToken: "YourAccessToken", 
                                 AccountID: "Your AccountID", 
                                 Debug:true}
-	fmt.Println(authMonzo.GetTransaction("id", "merchant").Merchant)
+	fmt.Println(auth.GetTransaction("id", "merchant").Merchant)
 }
 
 // Or..
 
 func main() {
-	authMonzo := myzo.AuthMonzo{ClientID: "Your ClientID", 
+	auth := myzo.Myzo{ClientID: "Your ClientID", 
                                 UserID: "Your UserID", 
                                 AccessToken: "YourAccessToken", 
                                 AccountID: "Your AccountID", 
                                 Debug:true}
-    for _, transaction := range authMonzo.GetAllTransactions(5, "merchant") {
+    for _, transaction := range auth.GetAllTransactions(5, "merchant") {
         fmt.Println(transaction.Merchant)
     }
 }
