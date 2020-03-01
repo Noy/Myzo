@@ -6,8 +6,8 @@ import (
 )
 
 func TestAuthMonzo_GetAllMerchants(t *testing.T) {
-	authMonzo := Myzo{ClientID: "", UserID: "", AccessToken: "", AccountID: "", Debug:true}
-	body := authMonzo.ResponseBody
+	auth := Myzo{ClientID: "", UserID: "", AccessToken: "", AccountID: "", Debug:true}
+	body := auth.ResponseBody
 	var m Merchant
 	if err := json.Unmarshal(body, &m); err != nil {
 		t.Error("Could not unmarshal response: " + err.Error())

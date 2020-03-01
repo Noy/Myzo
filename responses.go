@@ -82,6 +82,7 @@ type AccountResponse struct {
 }
 
 type Account struct {
+	Name string `json:"name"`
 	ID string `json:"id"`
 	Description string `json:"description"`
 	Created time.Time `json:"created"`

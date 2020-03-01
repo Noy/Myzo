@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-// So this function is because Myzo stores balances, etc as a 64 bit integer.
+// So this function is because Monzo stores balances, etc as a 64 bit integer.
 // With that being said, this function makes it more friendly to read.
 func Convert64IntToFloat(v int64) float64 {
 	before := v

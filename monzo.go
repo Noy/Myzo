@@ -88,12 +88,14 @@ func (auth *Myzo) potResponseHandler() (*PotResponse, error) {
 /**
 	Base request for handling transaction responses.
 */
-func (auth *Myzo) transactionResponseHandler(bulkRequest bool, daysAgo int, expandBy, optionalId string) (*TransactionsResponse, error) {
+func (auth *Myzo) transactionResponseHandler(bulkRequest bool, daysAgo int, expandBy, optionalId, limit string) (*TransactionsResponse, error) {
 	split := strings.Split(time.Now().AddDate(0,0, -daysAgo).Format(time.RFC3339), "+")
 	var resp []byte
 	var err error
 	if bulkRequest {
-		resp, err = auth.authenticate("GET", TransactionsEndpoint+optionalId, "&since="+split[0]+"Z&expand[]="+expandBy)
+		resp, err = auth.authenticate("GET",
+			TransactionsEndpoint+optionalId,
+			"&since="+split[0]+"Z&expand[]="+expandBy+"&limit="+limit)
 	} else {
 		resp, err = auth.authenticate("GET", TransactionsEndpoint+optionalId, "&expand[]="+expandBy)
 	}

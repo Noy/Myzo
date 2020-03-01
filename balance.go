@@ -5,6 +5,10 @@ func baseBalanceRequest(auth *Myzo) *BalanceResponse {
 	return r
 }
 
+func (auth *Myzo) BalanceDetails() *BalanceResponse {
+	return baseBalanceRequest(auth)
+}
+
 func (auth *Myzo) GetBalance() float64 {
 	return Convert64IntToFloat(baseBalanceRequest(auth).Balance)
 }
