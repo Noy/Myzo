@@ -65,7 +65,7 @@ func bulkTransactionsRequest(auth *Myzo, daysAgo,before int, expandBy string) *T
 }
 
 func baseTransactionRequest(auth *Myzo, expandBy, optionalId string) *TransactionsResponse {
-	r, _ := auth.transactionResponseHandler(false,0,0, expandBy, optionalId, "")
+	r, _ := auth.transactionResponseHandler(false,0,0, expandBy, optionalId)
 	return r
 }
 
