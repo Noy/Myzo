@@ -88,7 +88,7 @@ func (auth *Myzo) potResponseHandler() (*PotResponse, error) {
 /**
 	Base request for handling transaction responses.
 */
-func (auth *Myzo) transactionResponseHandler(bulkRequest bool, daysAgo, before int, expandBy, optionalId, limit string) (*TransactionsResponse, error) {
+func (auth *Myzo) transactionResponseHandler(bulkRequest bool, daysAgo, before int, expandBy, optionalId string) (*TransactionsResponse, error) {
 	split := strings.Split(time.Now().AddDate(0,0, -daysAgo).Format(time.RFC3339), "+")
 	splitBefore := strings.Split(time.Now().AddDate(0,0, -before).Format(time.RFC3339), "+")
 	var resp []byte
@@ -127,13 +127,9 @@ func (auth *Myzo) accountResponseHandler() (*AccountResponse, error) {
 /**
 	Send custom feed items to your timeline.
  */
-func (auth *Myzo) FeedHandler(URL string, params []string) ([]byte, error) {
+func (auth *Myzo) FeedHandler(URL string, params [6]string) ([]byte, error) {
 	client := &http.Client{}
 	data := url.Values{}
-	if len(params) != 6 {
-		log.Fatal("This needs exactly 6 parameters, no more, no less.")
-		return nil, nil
-	}
 	data.Set("params[title]", params[0])
 	data.Set("params[image_url]", params[1])
 	data.Set("params[background_color]", params[2])
