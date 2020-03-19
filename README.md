@@ -17,9 +17,10 @@ func main() {
     auth := myzo.Myzo{ClientID: "Your ClientID", 
                                 UserID: "Your UserID", 
                                 AccessToken: "YourAccessToken", 
-                                AccountID: "Your AccountID", 
+                                AccountIDs: map[string]string{"Personal":"ID", "Business":"ID", "Joint":"ID"}, 
                                 Debug:true}
-	fmt.Println(auth.GetTransaction("id", "merchant").Merchant)
+    currentAccountID := auth.AccountIDs["Personal"]
+	fmt.Println(auth.GetTransaction("id", "merchant", currentAccountID).Merchant)
 }
 
 // Or..
@@ -28,9 +29,10 @@ func main() {
 	auth := myzo.Myzo{ClientID: "Your ClientID", 
                                 UserID: "Your UserID", 
                                 AccessToken: "YourAccessToken", 
-                                AccountID: "Your AccountID", 
+                                AccountIDs: map[string]string{"Personal":"ID", "Business":"ID", "Joint":"ID"}, 
                                 Debug:true}
-    for _, transaction := range auth.GetAllTransactions(5, "merchant", "") {
+    currentAccountID := auth.AccountIDs["Personal"]
+    for _, transaction := range auth.GetAllTransactions(5, 0, "", currentAccountID) {
         fmt.Println(transaction.Merchant)
     }
 }

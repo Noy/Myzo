@@ -12,29 +12,29 @@ import (
 )
 
 const (
-	BaseURL = "https://api.monzo.com"
-	BalanceEndpoint = "/balance"
+	BaseURL              = "https://api.monzo.com"
+	BalanceEndpoint      = "/balance"
 	TransactionsEndpoint = "/transactions"
-	AccountEndpoint = "/accounts"
-	PotsEndpoint = "/pots"
+	AccountEndpoint      = "/accounts"
+	PotsEndpoint         = "/pots"
 )
 
 type Myzo struct {
-	ClientID string
-	UserID string
+	ClientID    string
+	UserID      string
 	AccessToken string
-	AccountID string
+	AccountIDs  map[string]string
 
-	Debug bool
+	Debug        bool
 	ResponseBody []byte
 }
 
 /**
-	Authentication with Monzo.
+Authentication with Monzo.
 */
-func (auth *Myzo) authenticate(method, endpoint, params string) ([]byte, error) {
-	client := &http.Client{Timeout:time.Second * 2}
-	req, err := http.NewRequest(method, BaseURL+endpoint+"?account_id="+auth.AccountID+params, nil)
+func (auth *Myzo) authenticate(method, endpoint, params, accountId string) ([]byte, error) {
+	client := &http.Client{Timeout: time.Second * 2}
+	req, err := http.NewRequest(method, BaseURL+endpoint+"?account_id="+accountId+params, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -56,10 +56,10 @@ func (auth *Myzo) authenticate(method, endpoint, params string) ([]byte, error) 
 }
 
 /**
-	Base request for handling balance responses.
+Base request for handling balance responses.
 */
-func (auth *Myzo) balanceResponseHandler() (*BalanceResponse, error) {
-	resp, err := auth.authenticate("GET", BalanceEndpoint,  "")
+func (auth *Myzo) balanceResponseHandler(accountId string) (*BalanceResponse, error) {
+	resp, err := auth.authenticate("GET", BalanceEndpoint, "", accountId)
 	if err != nil {
 		return nil, err
 	}
@@ -71,10 +71,10 @@ func (auth *Myzo) balanceResponseHandler() (*BalanceResponse, error) {
 }
 
 /**
-	Base request for handling Pot responses.
+Base request for handling Pot responses.
 */
-func (auth *Myzo) potResponseHandler() (*PotResponse, error) {
-	resp, err := auth.authenticate("GET", PotsEndpoint, "")
+func (auth *Myzo) potResponseHandler(accountId string) (*PotResponse, error) {
+	resp, err := auth.authenticate("GET", PotsEndpoint, "", accountId)
 	if err != nil {
 		return nil, err
 	}
@@ -86,18 +86,18 @@ func (auth *Myzo) potResponseHandler() (*PotResponse, error) {
 }
 
 /**
-	Base request for handling transaction responses.
+Base request for handling transaction responses.
 */
-func (auth *Myzo) transactionResponseHandler(bulkRequest bool, daysAgo, before int, expandBy, optionalId string) (*TransactionsResponse, error) {
-	split := strings.Split(time.Now().AddDate(0,0, -daysAgo).Format(time.RFC3339), "+")
-	splitBefore := strings.Split(time.Now().AddDate(0,0, -before).Format(time.RFC3339), "+")
+func (auth *Myzo) transactionResponseHandler(bulkRequest bool, daysAgo, before int, expandBy, optionalId, accountId string) (*TransactionsResponse, error) {
+	split := strings.Split(time.Now().AddDate(0, 0, -daysAgo).Format(time.RFC3339), "+")
+	splitBefore := strings.Split(time.Now().AddDate(0, 0, -before).Format(time.RFC3339), "+")
 	var resp []byte
 	var err error
 	if bulkRequest {
 		resp, err = auth.authenticate("GET",
-			TransactionsEndpoint+optionalId, "&since="+split[0]+"Z&expand[]="+expandBy+"&before="+splitBefore[0]+"Z")
+			TransactionsEndpoint+optionalId, "&since="+split[0]+"Z&expand[]="+expandBy+"&before="+splitBefore[0]+"Z", accountId)
 	} else {
-		resp, err = auth.authenticate("GET", TransactionsEndpoint+optionalId, "&expand[]="+expandBy)
+		resp, err = auth.authenticate("GET", TransactionsEndpoint+optionalId, "&expand[]="+expandBy, accountId)
 	}
 	if err != nil {
 		return nil, err
@@ -110,10 +110,10 @@ func (auth *Myzo) transactionResponseHandler(bulkRequest bool, daysAgo, before i
 }
 
 /**
-	Base request for handling account responses.
- */
+Base request for handling account responses.
+*/
 func (auth *Myzo) accountResponseHandler() (*AccountResponse, error) {
-	resp, err := auth.authenticate("GET", AccountEndpoint,"")
+	resp, err := auth.authenticate("GET", AccountEndpoint, "", "") // no need for account ID
 	if err != nil {
 		return nil, err
 	}
@@ -125,9 +125,9 @@ func (auth *Myzo) accountResponseHandler() (*AccountResponse, error) {
 }
 
 /**
-	Send custom feed items to your timeline.
- */
-func (auth *Myzo) FeedHandler(URL string, params [6]string) ([]byte, error) {
+Send custom feed items to your timeline.
+*/
+func (auth *Myzo) FeedHandler(URL string, params [6]string, accountId string) ([]byte, error) {
 	client := &http.Client{}
 	data := url.Values{}
 	data.Set("params[title]", params[0])
@@ -137,7 +137,7 @@ func (auth *Myzo) FeedHandler(URL string, params [6]string) ([]byte, error) {
 	data.Set("params[title_color]", params[4])
 	data.Set("params[body]", params[5])
 	req, err := http.NewRequest("POST",
-		BaseURL+"/feed?account_id="+auth.AccountID+"&type=basic"+"&url="+URL,
+		BaseURL+"/feed?account_id="+accountId+"&type=basic"+"&url="+URL,
 		bytes.NewBufferString(data.Encode()))
 	if err != nil {
 		return nil, err
