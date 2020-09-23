@@ -7,7 +7,7 @@ import (
 )
 
 func TestAuthMonzo_GetAllMerchants(t *testing.T) {
-	auth := Myzo{ClientID: "", UserID: "", AccessToken: "", AccountID: "", Debug:true}
+	auth := Myzo{ClientID: "", UserID: "", AccessToken: "", AccountIDs: map[string]string{"Business": "", "Personal": ""}, Debug: true}
 	body := auth.ResponseBody
 	var m Merchant
 	if err := json.Unmarshal(body, &m); err != nil {
@@ -22,7 +22,7 @@ func TestAuthMonzo_GetAllMerchants(t *testing.T) {
 }
 
 func TestMyzo_FeedHandler(t *testing.T) {
-	auth := Myzo{ClientID:"", UserID:"", AccessToken:"", AccountID:"", Debug:true, ResponseBody: nil}
+	auth := Myzo{ClientID: "", UserID: "", AccessToken: "", AccountIDs: map[string]string{"Business": "", "Personal": ""}, Debug: true, ResponseBody: nil}
 	resp, err := auth.FeedHandler("https://google.com", [6]string{
 		"This will be the notification on your app!",
 		"Link to url",
@@ -30,7 +30,7 @@ func TestMyzo_FeedHandler(t *testing.T) {
 		"#000000",
 		"#000000",
 		"Body text",
-	})
+	}, "")
 	if err != nil {
 		t.Error(err)
 	}

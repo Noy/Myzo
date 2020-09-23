@@ -3,6 +3,7 @@ package myzo
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -32,13 +33,16 @@ type Myzo struct {
 /**
 Authentication with Monzo.
 */
-func (auth *Myzo) authenticate(method, endpoint, params, accountId string) ([]byte, error) {
+func (auth *Myzo) authenticate(method, url string, data io.Reader) ([]byte, error) {
 	client := &http.Client{Timeout: time.Second * 2}
-	req, err := http.NewRequest(method, BaseURL+endpoint+"?account_id="+accountId+params, nil)
+	req, err := http.NewRequest(method, url, data)
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Set("Authorization", "Bearer "+auth.AccessToken)
+	if method == "PUT" || method == "POST" {
+		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -46,6 +50,7 @@ func (auth *Myzo) authenticate(method, endpoint, params, accountId string) ([]by
 	defer resp.Body.Close()
 	jsonResponse, err := ioutil.ReadAll(resp.Body)
 	if auth.Debug {
+		log.Println(url)
 		auth.ResponseBody = jsonResponse
 		log.Println(string(jsonResponse))
 	}
@@ -56,10 +61,36 @@ func (auth *Myzo) authenticate(method, endpoint, params, accountId string) ([]by
 }
 
 /**
+For all GET requests
+*/
+func (auth *Myzo) getFromMonzo(endpoint, params, accountId string) ([]byte, error) {
+	var accountIdParam = "?account_id="
+	if endpoint == PotsEndpoint {
+		accountIdParam = "?current_account_id="
+	}
+	jsonResponse, err := auth.authenticate("GET", BaseURL+endpoint+accountIdParam+accountId+params, nil)
+	if err != nil {
+		return nil, err
+	}
+	return jsonResponse, nil
+}
+
+/**
+For all POST/PUT requests, please note the authentication adds the 'application/x-www-form-urlencoded' for all of these requests.
+*/
+func (auth *Myzo) postOrPutToMonzo(method, endPoint, extraData string, data url.Values) ([]byte, error) {
+	resp, err := auth.authenticate(method, BaseURL+endPoint+extraData, bytes.NewBufferString(data.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+/**
 Base request for handling balance responses.
 */
 func (auth *Myzo) balanceResponseHandler(accountId string) (*BalanceResponse, error) {
-	resp, err := auth.authenticate("GET", BalanceEndpoint, "", accountId)
+	resp, err := auth.getFromMonzo(BalanceEndpoint, "", accountId)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +105,7 @@ func (auth *Myzo) balanceResponseHandler(accountId string) (*BalanceResponse, er
 Base request for handling Pot responses.
 */
 func (auth *Myzo) potResponseHandler(accountId string) (*PotResponse, error) {
-	resp, err := auth.authenticate("GET", PotsEndpoint, "", accountId)
+	resp, err := auth.getFromMonzo(PotsEndpoint, "", accountId)
 	if err != nil {
 		return nil, err
 	}
@@ -94,10 +125,9 @@ func (auth *Myzo) transactionResponseHandler(bulkRequest bool, daysAgo, before i
 	var resp []byte
 	var err error
 	if bulkRequest {
-		resp, err = auth.authenticate("GET",
-			TransactionsEndpoint+optionalId, "&since="+split[0]+"Z&expand[]="+expandBy+"&before="+splitBefore[0]+"Z", accountId)
+		resp, err = auth.getFromMonzo(TransactionsEndpoint+optionalId, "&since="+split[0]+"Z&expand[]="+expandBy+"&before="+splitBefore[0]+"Z", accountId)
 	} else {
-		resp, err = auth.authenticate("GET", TransactionsEndpoint+optionalId, "&expand[]="+expandBy, accountId)
+		resp, err = auth.getFromMonzo(TransactionsEndpoint+optionalId, "&expand[]="+expandBy, accountId)
 	}
 	if err != nil {
 		return nil, err
@@ -113,7 +143,7 @@ func (auth *Myzo) transactionResponseHandler(bulkRequest bool, daysAgo, before i
 Base request for handling account responses.
 */
 func (auth *Myzo) accountResponseHandler() (*AccountResponse, error) {
-	resp, err := auth.authenticate("GET", AccountEndpoint, "", "") // no need for account ID
+	resp, err := auth.getFromMonzo(AccountEndpoint, "", "") // no need for account ID
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +158,6 @@ func (auth *Myzo) accountResponseHandler() (*AccountResponse, error) {
 Send custom feed items to your timeline.
 */
 func (auth *Myzo) FeedHandler(URL string, params [6]string, accountId string) ([]byte, error) {
-	client := &http.Client{}
 	data := url.Values{}
 	data.Set("params[title]", params[0])
 	data.Set("params[image_url]", params[1])
@@ -136,23 +165,7 @@ func (auth *Myzo) FeedHandler(URL string, params [6]string, accountId string) ([
 	data.Set("params[body_color]", params[3])
 	data.Set("params[title_color]", params[4])
 	data.Set("params[body]", params[5])
-	req, err := http.NewRequest("POST",
-		BaseURL+"/feed?account_id="+accountId+"&type=basic"+"&url="+URL,
-		bytes.NewBufferString(data.Encode()))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("Authorization", "Bearer "+auth.AccessToken)
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	if err != nil {
-		log.Println(err.Error())
-	}
-	defer req.Body.Close()
-	respBody, err := ioutil.ReadAll(resp.Body)
+	respBody, err := auth.postOrPutToMonzo("POST", "/feed", "?account_id="+accountId+"&type=basic"+"&url="+URL, data)
 	if err != nil {
 		return nil, err
 	}
