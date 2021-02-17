@@ -30,6 +30,9 @@ type Transaction struct {
 	DedupeID                   string    `json:"dedupe_id"`
 	Scheme                     string    `json:"scheme"`
 	Merchant                   Merchant  `json:"merchant"`
+	//Misc, if you want to parse the dates as a string instead of time.Time
+	CreatedString string
+	MerchantCreated string
 }
 
 type Merchant struct {
