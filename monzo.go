@@ -125,7 +125,7 @@ func (auth *Myzo) transactionResponseHandler(bulkRequest bool, daysAgo, before i
 	var resp []byte
 	var err error
 	if bulkRequest {
-		resp, err = auth.getFromMonzo(TransactionsEndpoint+optionalId, "&since="+split[0]+"Z&expand[]="+expandBy+"&before="+splitBefore[0]+"Z", accountId)
+		resp, err = auth.getFromMonzo(TransactionsEndpoint+optionalId, "&since="+split[0]+"&expand[]="+expandBy+"&before="+splitBefore[0], accountId)
 	} else {
 		resp, err = auth.getFromMonzo(TransactionsEndpoint+optionalId, "&expand[]="+expandBy, accountId)
 	}
