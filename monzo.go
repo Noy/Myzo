@@ -39,7 +39,7 @@ func (auth *Myzo) authenticate(method, url string, data io.Reader) ([]byte, erro
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Authorization", "Bearer "+auth.AccessToken)
+	req.Header.Set("Authorization", "Bearer " + auth.AccessToken)
 	if method == "PUT" || method == "POST" {
 		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	}
