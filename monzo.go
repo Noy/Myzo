@@ -3,6 +3,7 @@ package myzo
 import (
 	"bytes"
 	"encoding/json"
+	utils "github.com/Noy/Go-Utilities"
 	"io"
 	"io/ioutil"
 	"log"
@@ -119,9 +120,13 @@ func (auth *Myzo) potResponseHandler(accountId string) (*PotResponse, error) {
 /**
 Base request for handling transaction responses.
 */
+
 func (auth *Myzo) transactionResponseHandler(bulkRequest bool, daysAgo, before int, expandBy, optionalId, accountId string) (*TransactionsResponse, error) {
-	split := strings.Split(time.Now().AddDate(0, 0, -daysAgo).Format(time.RFC3339), "+")
-	splitBefore := strings.Split(time.Now().AddDate(0, 0, -before).Format(time.RFC3339), "+")
+	// This returns example: 2021-03-19T00:00:00
+	split := strings.Split(utils.Bod(time.Now().AddDate(0, 0, -daysAgo)).Format(time.RFC3339), "+")
+	// This returns example: 2021-03-19T23:59:59
+	splitBefore := strings.Split(utils.Eod(time.Now().AddDate(0, 0, -before)).Format(time.RFC3339), "+")
+	// So if you want a day's worth of data, make sure daysAgo and before are both 1
 	var resp []byte
 	var err error
 	if bulkRequest {
