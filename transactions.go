@@ -31,7 +31,7 @@ type Transaction struct {
 	Scheme                     string    `json:"scheme"`
 	Merchant                   Merchant  `json:"merchant"`
 	//Misc, if you want to parse the dates as a string instead of time.Time
-	CreatedString string
+	CreatedString   string
 	MerchantCreated string
 }
 
@@ -62,8 +62,8 @@ type Merchant struct {
 	DisableFeedback bool      `json:"disable_feedback"`
 }
 
-func bulkTransactionsRequest(auth *Myzo, daysAgo, before int, expandBy, accountId string) *TransactionsResponse {
-	r, _ := auth.transactionResponseHandler(true, daysAgo, before, expandBy, "", accountId)
+func bulkTransactionsRequest(auth *Myzo, from, to int, expandBy, accountId string) *TransactionsResponse {
+	r, _ := auth.transactionResponseHandler(true, from, to, expandBy, "", accountId)
 	return r
 }
 
@@ -72,17 +72,17 @@ func baseTransactionRequest(auth *Myzo, expandBy, optionalId, accountId string) 
 	return r
 }
 
-func (auth *Myzo) GetAllTransactions(daysAgo, before int, expandBy, accountId string) []Transaction {
-	return bulkTransactionsRequest(auth, daysAgo, before, expandBy, accountId).Transactions
+func (auth *Myzo) GetAllTransactions(from, to int, expandBy, accountId string) []Transaction {
+	return bulkTransactionsRequest(auth, from, to, expandBy, accountId).Transactions
 }
 
 func (auth *Myzo) GetTransaction(id, expandBy, accountId string) Transaction {
 	return baseTransactionRequest(auth, expandBy, "/"+id, accountId).Transaction
 }
 
-func (auth *Myzo) GetAllMerchants(daysAgo, before int, accountId string) []Merchant {
+func (auth *Myzo) GetAllMerchants(from, to int, accountId string) []Merchant {
 	var merchants []Merchant
-	for _, t := range bulkTransactionsRequest(auth, daysAgo, before, "merchant", accountId).Transactions {
+	for _, t := range bulkTransactionsRequest(auth, from, to, "merchant", accountId).Transactions {
 		merchants = append(merchants, t.Merchant)
 	}
 	return merchants

@@ -3,7 +3,6 @@ package myzo
 import (
 	"bytes"
 	"encoding/json"
-	utils "github.com/Noy/Go-Utilities"
 	"io"
 	"io/ioutil"
 	"log"
@@ -120,17 +119,14 @@ func (auth *Myzo) potResponseHandler(accountId string) (*PotResponse, error) {
 /**
 Base request for handling transaction responses.
 */
-
-func (auth *Myzo) transactionResponseHandler(bulkRequest bool, daysAgo, before int, expandBy, optionalId, accountId string) (*TransactionsResponse, error) {
-	// This returns example: 2021-03-19T00:00:00
-	split := strings.Split(utils.Bod(time.Now().AddDate(0, 0, -daysAgo)).Format(time.RFC3339), "+")
-	// This returns example: 2021-03-19T23:59:59
-	splitBefore := strings.Split(utils.Eod(time.Now().AddDate(0, 0, -before)).Format(time.RFC3339), "+")
-	// So if you want a day's worth of data, make sure daysAgo and before are both 1
+func (auth *Myzo) transactionResponseHandler(bulkRequest bool, from, to int, expandBy, optionalId, accountId string) (*TransactionsResponse, error) {
+	// FROM / TO ARE HOURS. SO IF YOU WANT A FULL DAY'S DATA, USE 24 AS FROM AND 0 AS TO
+	fromHour := strings.Split(time.Now().Add(time.Duration(-from)*time.Hour).Format(time.RFC3339), "+")
+	toHour := strings.Split(time.Now().Add(time.Duration(-to)*time.Hour).Format(time.RFC3339), "+")
 	var resp []byte
 	var err error
 	if bulkRequest {
-		resp, err = auth.getFromMonzo(TransactionsEndpoint+optionalId, "&since="+split[0]+"&expand[]="+expandBy+"&before="+splitBefore[0], accountId)
+		resp, err = auth.getFromMonzo(TransactionsEndpoint+optionalId, "&since="+fromHour[0]+"&expand[]="+expandBy+"&before="+toHour[0], accountId)
 	} else {
 		resp, err = auth.getFromMonzo(TransactionsEndpoint+optionalId, "&expand[]="+expandBy, accountId)
 	}
