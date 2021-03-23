@@ -43,3 +43,12 @@ func (auth *Myzo) WhoAmI() (string, error) {
 		return string(body), nil
 	}
 }
+
+func (auth *Myzo) VerifiedThroughApp() (string, error) {
+	body, err := auth.getFromMonzo("/accounts", "", "")
+	if err != nil {
+		return "", err
+	} else {
+		return string(body), nil
+	}
+}
