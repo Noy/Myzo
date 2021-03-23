@@ -62,17 +62,17 @@ type Merchant struct {
 	DisableFeedback bool      `json:"disable_feedback"`
 }
 
-func bulkTransactionsRequest(auth *Myzo, from, to int, expandBy, accountId string) *TransactionsResponse {
+func bulkTransactionsRequest(auth *Myzo, from, to string, expandBy, accountId string) *TransactionsResponse {
 	r, _ := auth.transactionResponseHandler(true, from, to, expandBy, "", accountId)
 	return r
 }
 
 func baseTransactionRequest(auth *Myzo, expandBy, optionalId, accountId string) *TransactionsResponse {
-	r, _ := auth.transactionResponseHandler(false, 0, 0, expandBy, optionalId, accountId)
+	r, _ := auth.transactionResponseHandler(false, "", "", expandBy, optionalId, accountId)
 	return r
 }
 
-func (auth *Myzo) GetAllTransactions(from, to int, expandBy, accountId string) []Transaction {
+func (auth *Myzo) GetAllTransactions(from, to string, expandBy, accountId string) []Transaction {
 	return bulkTransactionsRequest(auth, from, to, expandBy, accountId).Transactions
 }
 
@@ -80,7 +80,7 @@ func (auth *Myzo) GetTransaction(id, expandBy, accountId string) Transaction {
 	return baseTransactionRequest(auth, expandBy, "/"+id, accountId).Transaction
 }
 
-func (auth *Myzo) GetAllMerchants(from, to int, accountId string) []Merchant {
+func (auth *Myzo) GetAllMerchants(from, to string, accountId string) []Merchant {
 	var merchants []Merchant
 	for _, t := range bulkTransactionsRequest(auth, from, to, "merchant", accountId).Transactions {
 		merchants = append(merchants, t.Merchant)
