@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 )
 
@@ -119,14 +118,11 @@ func (auth *Myzo) potResponseHandler(accountId string) (*PotResponse, error) {
 /**
 Base request for handling transaction responses.
 */
-func (auth *Myzo) transactionResponseHandler(bulkRequest bool, from, to int, expandBy, optionalId, accountId string) (*TransactionsResponse, error) {
-	// FROM / TO ARE HOURS. SO IF YOU WANT A FULL DAY'S DATA, USE 24 AS FROM AND 0 AS TO
-	fromHour := strings.Split(time.Now().Add(time.Duration(-from)*time.Hour).Format(time.RFC3339), "+")
-	toHour := strings.Split(time.Now().Add(time.Duration(-to)*time.Hour).Format(time.RFC3339), "+")
+func (auth *Myzo) transactionResponseHandler(bulkRequest bool, from, to string, expandBy, optionalId, accountId string) (*TransactionsResponse, error) {
 	var resp []byte
 	var err error
 	if bulkRequest {
-		resp, err = auth.getFromMonzo(TransactionsEndpoint+optionalId, "&since="+fromHour[0]+"&expand[]="+expandBy+"&before="+toHour[0], accountId)
+		resp, err = auth.getFromMonzo(TransactionsEndpoint+optionalId, "&since="+from+"&expand[]="+expandBy+"&before="+to, accountId)
 	} else {
 		resp, err = auth.getFromMonzo(TransactionsEndpoint+optionalId, "&expand[]="+expandBy, accountId)
 	}
