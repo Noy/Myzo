@@ -23,6 +23,18 @@ type Pot struct {
 	Deleted  bool      `json:"deleted"`
 }
 
+// So you can display it nicely..
+type PotFriendly struct {
+	ID       string
+	Name     string
+	Style    string
+	Balance  float64
+	Currency string
+	Created  string
+	Updated  string
+	Deleted  string
+}
+
 func basePotRequest(auth *Myzo, accountId string) *PotResponse {
 	r, _ := auth.potResponseHandler(accountId)
 	return r
