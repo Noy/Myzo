@@ -13,26 +13,31 @@ type PotResponse struct {
 }
 
 type Pot struct {
-	ID       string    `json:"id"`
-	Name     string    `json:"name"`
-	Style    string    `json:"style"`
-	Balance  int64     `json:"balance"`
-	Currency string    `json:"currency"`
-	Created  time.Time `json:"created"`
-	Updated  time.Time `json:"updated"`
-	Deleted  bool      `json:"deleted"`
-}
+	ID               string `json:"id"`
+	Name             string `json:"name"`
+	Style            string `json:"style"`
+	Balance          int64  `json:"balance"`
+	Currency         string `json:"currency"`
+	GoalAmount       int64  `json:"goal_amount"`
+	Type             string `json:"type"`
+	ProductId        string `json:"product_id"`
+	CurrentAccountId string `json:"current_account_id"`
+	CoverImageUrl    string `json:"cover_image_url"`
+	IsaWrapper       string `json:"isa_wrapper"`
+	RoundUp          bool   `json:"round_up"`
+	//RoundUpMultiplier int64?
+	IsTaxPot          bool      `json:"is_tax_pot"` // FOR BUSINESSES
+	Created           time.Time `json:"created"`
+	Updated           time.Time `json:"updated"`
+	Deleted           bool      `json:"deleted"`
+	Locked            bool      `json:"locked"`
+	CharityId         string    `json:"charity_id"`
+	AvailableForBills bool      `json:"available_for_bills"`
 
-// So you can display it nicely..
-type PotFriendly struct {
-	ID       string
-	Name     string
-	Style    string
-	Balance  float64
-	Currency string
-	Created  string
-	Updated  string
-	Deleted  string
+	//Friendly
+	BalanceAsFloat  float64
+	CreatedFriendly string
+	UpdatedFriendly string
 }
 
 func basePotRequest(auth *Myzo, accountId string) *PotResponse {
