@@ -35,9 +35,10 @@ type Pot struct {
 	AvailableForBills bool      `json:"available_for_bills"`
 
 	//Friendly
-	BalanceAsFloat  float64
-	CreatedFriendly string
-	UpdatedFriendly string
+	BalanceFriendly    float64
+	GoalAmountFriendly float64
+	CreatedFriendly    string
+	UpdatedFriendly    string
 }
 
 func basePotRequest(auth *Myzo, accountId string) *PotResponse {
