@@ -79,6 +79,9 @@ type Merchant struct {
 		EnrichedFromSettlement string `json:"enriched_from_settlement"`
 	}
 	DisableFeedback bool `json:"disable_feedback"`
+	//Friendly
+	CreatedString string
+	UpdatedString string
 }
 
 func bulkTransactionsRequest(auth *Myzo, from, to string, expandBy, accountId string) *TransactionsResponse {
