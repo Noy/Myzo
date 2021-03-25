@@ -8,19 +8,33 @@ type TransactionsResponse struct {
 }
 
 type Transaction struct {
-	AccountBalance             int64     `json:"account_balance"`
-	Amount                     int64     `json:"amount"`
-	Created                    time.Time `json:"created"`
-	Currency                   string    `json:"currency"`
-	Description                string    `json:"description"`
-	ID                         string    `json:"id"`
-	MetaData                   struct{}  `json:"metadata"`
+	AccountBalance int64     `json:"account_balance"`
+	Amount         int64     `json:"amount"`
+	Created        time.Time `json:"created"`
+	Currency       string    `json:"currency"`
+	Description    string    `json:"description"`
+	ID             string    `json:"id"`
+	MetaData       struct {
+		LedgerInsertionId          string `json:"ledger_insertion_id"`
+		MasterCardApprovalType     string `json:"mastercard_approval_type"`
+		MasterCardAuthMessageId    string `json:"mastercard_auth_message_id"`
+		MasterCardId               string `json:"mastercard_id"`
+		MasterCardLifecycle_Id     string `json:"mastercard_lifecycle_id"`
+		Mcc                        string `json:"mcc"`
+		TokenTransactionIdentifier string `json:"token_transaction_identifier"`
+		TokenUniqueReference       string `json:"token_unique_reference"`
+		TokenizationMethod         string `json:"tokenization_method"`
+	} `json:"metadata"`
 	Notes                      string    `json:"notes"`
 	IsLoad                     bool      `json:"is_load"`
 	Settled                    string    `json:"settled"`
 	Category                   string    `json:"category"`
 	LocalAmount                int64     `json:"local_amount"`
 	LocalCurrency              string    `json:"local_currency"`
+	Updated                    time.Time `json:"updated"`
+	AccountId                  string    `json:"account_id"`
+	UserId                     string    `json:"user_id"`
+	IncludeInSpending          bool      `json:"include_in_spending"`
 	CanBeExcludedFromBreakdown bool      `json:"can_be_excluded_from_breakdown"`
 	CanBeMadeSubscription      bool      `json:"can_be_made_subscription"`
 	CanSplitBill               bool      `json:"can_split_the_bill"`
@@ -32,6 +46,7 @@ type Transaction struct {
 	Merchant                   Merchant  `json:"merchant"`
 	//Misc, if you want to parse the dates as a string instead of time.Time
 	CreatedString   string
+	UpdatedString   string
 	MerchantCreated string
 }
 
@@ -58,8 +73,12 @@ type Merchant struct {
 		ZoomLevel      int64   `json:"zoom_level"`
 		Approximate    bool    `json:"approximate"`
 	} `json:"address"`
-	Updated         time.Time `json:"updated"`
-	DisableFeedback bool      `json:"disable_feedback"`
+	Updated  time.Time `json:"updated"`
+	MetaData struct {
+		CreatedForTransaction  string `json:"created_for_transaction"`
+		EnrichedFromSettlement string `json:"enriched_from_settlement"`
+	}
+	DisableFeedback bool `json:"disable_feedback"`
 }
 
 func bulkTransactionsRequest(auth *Myzo, from, to string, expandBy, accountId string) *TransactionsResponse {
