@@ -33,8 +33,7 @@ func Convert64IntToFloat(v int64) float64 {
 	}
 }
 
-// So this function is because Monzo stores balances, etc as a 64 bit integer.
-// With that being said, this function makes it more friendly to read.
+// String version so you can make the decimal places have to in case of it ending in 0
 func Convert64IntToString(v int64) string {
 	before := v
 	if v < 0 {
