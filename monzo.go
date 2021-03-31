@@ -3,6 +3,7 @@ package myzo
 import (
 	"bytes"
 	"encoding/json"
+	utils "github.com/Noy/Go-Utilities"
 	"io"
 	"io/ioutil"
 	"log"
@@ -51,7 +52,7 @@ func (auth *Myzo) authenticate(method, url string, data io.Reader) ([]byte, erro
 	if auth.Debug {
 		log.Println(url)
 		auth.ResponseBody = jsonResponse
-		log.Println(string(jsonResponse))
+		log.Println(utils.JsonPrettyPrint(string(jsonResponse)))
 	}
 	if err != nil {
 		return nil, err

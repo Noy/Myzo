@@ -1,6 +1,7 @@
 package myzo
 
 import "time"
+import "log"
 
 type TransactionsResponse struct {
 	Transactions []Transaction `json:"transactions"`
@@ -25,6 +26,13 @@ type Transaction struct {
 		TokenUniqueReference       string `json:"token_unique_reference"`
 		TokenizationMethod         string `json:"tokenization_method"`
 	} `json:"metadata"`
+	Counterparty struct {
+		AccountNumber           string `json:"account_number"`
+		BenefirciaryAccountType string `json:"beneficiary_account_type"`
+		Name                    string `json:"name"`
+		SortCode                string `json:"sort_code"`
+		UserId                  string `json:"user_id"`
+	} `json:"counterparty"`
 	Notes                      string    `json:"notes"`
 	IsLoad                     bool      `json:"is_load"`
 	Settled                    string    `json:"settled"`
@@ -51,15 +59,15 @@ type Transaction struct {
 }
 
 type Merchant struct {
-	ID       string    `json:"id"`
-	GroupID  string    `json:"group_id"`
-	Created  time.Time `json:"created"`
-	Name     string    `json:"name"`
-	Logo     string    `json:"logo"`
-	Emoji    string    `json:"emoji"`
-	Category string    `json:"category"`
-	Online   bool      `json:"online"`
-	ATM      bool      `json:"atm"`
+	ID       string `json:"id"`
+	GroupID  string `json:"group_id"`
+	Created  string `json:"created"`
+	Name     string `json:"name"`
+	Logo     string `json:"logo"`
+	Emoji    string `json:"emoji"`
+	Category string `json:"category"`
+	Online   bool   `json:"online"`
+	ATM      bool   `json:"atm"`
 	Address  struct {
 		ShortFormatted string  `json:"short_formatted"`
 		Formatted      string  `json:"formatted"`
@@ -73,19 +81,19 @@ type Merchant struct {
 		ZoomLevel      int64   `json:"zoom_level"`
 		Approximate    bool    `json:"approximate"`
 	} `json:"address"`
-	Updated  time.Time `json:"updated"`
+	Updated  string `json:"updated"`
 	MetaData struct {
 		CreatedForTransaction  string `json:"created_for_transaction"`
 		EnrichedFromSettlement string `json:"enriched_from_settlement"`
 	}
 	DisableFeedback bool `json:"disable_feedback"`
-	//Friendly
-	CreatedString string
-	UpdatedString string
 }
 
 func bulkTransactionsRequest(auth *Myzo, from, to string, expandBy, accountId string) *TransactionsResponse {
-	r, _ := auth.transactionResponseHandler(true, from, to, expandBy, "", accountId)
+	r, err := auth.transactionResponseHandler(true, from, to, expandBy, "", accountId)
+	if err != nil {
+		log.Println(err.Error())
+	}
 	return r
 }
 
